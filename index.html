@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EntregaN1</title>
+</head>
+<body>
+    <script src="./index.js"></script>
+</body>
+</html>
+
+
+El mensaje que estás viendo es una advertencia de Git sobre la falta de permisos para acceder a ciertos directorios y archivos en tu sistema. Esto generalmente ocurre cuando estás ejecutando comandos de Git en una ubicación donde no tienes permisos suficientes para acceder a esos archivos o directorios.
+
+Git intenta analizar los cambios en el repositorio, pero encuentra ciertas ubicaciones donde no puede acceder debido a las restricciones de permisos del sistema operativo.
+
+Si estás seguro de que los archivos y directorios que aparecen como no rastreados o cambios no confirmados no son relevantes para tu repositorio, puedes ignorar esas advertencias y proceder con tus tareas de Git normales.
+
+Para limpiar la salida y centrarte solo en los cambios que deseas confirmar, puedes usar los siguientes comandos:
+
+1. Para eliminar el archivo eliminado "index.html" de los cambios no preparados:
+
+```bash
+git restore ../../../Documents/coder/clases/clase_10/index.html
+```
+
+2. Para agregar todos los archivos no rastreados y cambios para ser confirmados:
+
+```bash
+git add .
+```
+
+Ahora, cuando ejecutes `git status` nuevamente, solo deberías ver los cambios que están preparados para ser confirmados y ya no deberías ver las advertencias sobre los directorios no accesibles.
+
+Es importante tener en cuenta que algunos de los archivos y directorios que aparecen como no rastreados pueden ser archivos de sistema o configuraciones personales que no deben agregarse al repositorio de Git. En ese caso, debes asegurarte de agregar solo los archivos y directorios relevantes para el repositorio y utilizar un archivo `.gitignore` para evitar que los archivos no deseados se agreguen accidentalmente al repositorio en el futuro.
+
+Si continúas teniendo problemas o tienes alguna otra pregunta, no dudes en preguntar.
+
+
+El mensaje que estás viendo en la salida de `git status` indica que Git está teniendo problemas para acceder a algunos directorios y archivos en tu sistema debido a problemas de permisos. Esto suele ocurrir cuando intentas ejecutar comandos de Git en una ubicación que requiere permisos de administrador o no tiene permisos de lectura/escritura adecuados para el usuario que estás utilizando.
+
+Para solucionar este problema, hay algunas cosas que puedes intentar:
+
+1. **Ejecutar Git como administrador (en Windows)**:
+   Intenta abrir la consola o terminal como administrador antes de ejecutar los comandos de Git. Para hacerlo, haz clic con el botón derecho en el ícono de la consola o terminal y selecciona "Ejecutar como administrador". Luego, vuelve a ejecutar `git status` para ver si el problema persiste.
+
+2. **Verificar los permisos del directorio git**:
+   Asegúrate de que el directorio en el que te encuentras (el directorio de trabajo de Git) tenga los permisos adecuados para el usuario que estás utilizando. En sistemas Unix (Linux, macOS), puedes verificar los permisos del directorio actual con el siguiente comando:
+   ```
+   ls -ld .
+   ```
+   Si los permisos no son adecuados, puedes cambiarlos con el comando `chmod`. Por ejemplo, para permitir la lectura, escritura y ejecución para el usuario, puedes usar:
+   ```
+   chmod u+rwx .
+   ```
+
+3. **Clonar el repositorio en una ubicación diferente**:
+   Si estás trabajando en un repositorio que se encuentra en una ubicación protegida por permisos (como el directorio de usuario), intenta clonar el repositorio en una ubicación diferente donde tengas permisos completos, como el directorio de inicio (`~`) o en cualquier otra carpeta que desees.
+
+Recuerda que cambiar los permisos o ejecutar Git como administrador puede afectar otros aspectos del sistema, así que ten cuidado y asegúrate de comprender las implicaciones antes de realizar cambios significativos.
+
+Si ninguna de estas soluciones resuelve el problema, por favor, proporciona más detalles sobre tu sistema operativo y cómo estás ejecutando los comandos de Git para que pueda ayudarte mejor a resolver el problema.
