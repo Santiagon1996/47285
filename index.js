@@ -97,6 +97,7 @@ const producto3 = new Productos("auriculares", "tecnologia", 50000, [], "4AA", 7
 
 const productManager = new ProductManager()
 
+
 // productManager.addProduct(producto1)
 // productManager.addProduct(producto2)
 // productManager.addProduct(producto3)
@@ -109,3 +110,16 @@ const productManager = new ProductManager()
 //productManager.updateProducts(1,{title: "mouse", description: "electronica", price: 20000 , thumbnail: [], code:"20TT", stock: 33})
 
 //productManager.deleteProducts(3)
+
+productManager.addProduct(producto1)
+productManager.addProduct(producto2)
+productManager.addProduct(producto3)
+
+// productManager.getProducts()
+
+// productManager.getProductsById(2)
+
+//productManager.updateProducts(1,{title: "mouse", description: "electronica", price: 20000 , thumbnail: [], code:"20TT", stock: 33})
+
+//productManager.deleteProducts(1)
+
