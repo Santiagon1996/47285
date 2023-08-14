@@ -1,24 +1,27 @@
 import { promises as fs } from "fs"
+import { readFile } from "fs/promises";
 
 
 export class ProductManager {
     constructor(path) {
-        this.products = []
-        this.path = path 
+        this.path = path
+        this.products = this.readProductsFromJSON();
+    }
 
+    async readProductsFromJSON() {
+        try {
+            const info = await readFile(this.path, "utf-8");
+            return JSON.parse(info);
+        } catch (error) {
+            return []
+        }
     }
     async addProduct(product) {
-        if (
-            product.title == undefined ||
-            product.description == undefined ||
-            product.price == undefined ||
-            product.thumbnail == undefined ||
-            product.code == undefined ||
-            product.stock == undefined
-          ) {
-            return console.log(`todos los campos son obligatorios`);
-          }
 
+        const requiredFields = ["title", "description", "price", "thumbnail", "code", "stock"];
+        if (!requiredFields.every((field) => field in product)) {
+            return console.log("Todos los campos son obligatorios");
+        }
 
         const products = JSON.parse(await fs.readFile(this.path, `utf-8`))
         const encontrado = products.find((p) => p.id === product.id)
@@ -75,7 +78,8 @@ export class ProductManager {
         if (encontrado) {
             await fs.writeFile(this.path, JSON.stringify(products.filter(el => el.id != id)))
         } else {
-            console.log(`Not found`);
+            console.error(`Not found`);
         }
     }
+
 }
