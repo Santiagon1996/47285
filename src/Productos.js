@@ -1,4 +1,4 @@
-export class Productos {
+export  class Productos {
     static idIncrement = 0;
   
     constructor(title, description, price, thumbnail, code, stock) {

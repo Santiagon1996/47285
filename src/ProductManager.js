@@ -10,7 +10,7 @@ export class ProductManager {
 
     async readProductsFromJSON() {
         try {
-            const info = await readFile(this.path, "utf-8");
+            const info = await fs.readFile(this.path, "utf-8");
             return JSON.parse(info);
         } catch (error) {
             return []
