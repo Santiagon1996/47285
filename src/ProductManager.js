@@ -1,14 +1,30 @@
 import { promises as fs } from "fs"
-import { readFile } from "fs/promises";
 
+const path = `../productos.json`;
 
 export class ProductManager {
     constructor(path) {
         this.path = path
-        this.products = this.readProductsFromJSON();
+        this.products = this.getProducts();
+    }
+    async addProduct(product) {
+        const requiredFields = ["title", "description", "price", "thumbnail", "code", "stock"];
+        if (!requiredFields.every(field => field in product)) {
+            throw new Error("All fields are required");
+        }
+
+        const products = JSON.parse(await fs.readFile(this.path, "utf-8"));
+        const productExists = products.some(p => p.id === product.id);
+
+        if (productExists) {
+            throw new Error("Product already exists");
+        } else {
+            products.push(product);
+            await fs.writeFile(this.path, JSON.stringify(products));
+        }
     }
 
-    async readProductsFromJSON() {
+    async getProducts() {
         try {
             const info = await fs.readFile(this.path, "utf-8");
             return JSON.parse(info);
@@ -16,70 +32,48 @@ export class ProductManager {
             return []
         }
     }
-    async addProduct(product) {
 
-        const requiredFields = ["title", "description", "price", "thumbnail", "code", "stock"];
-        if (!requiredFields.every((field) => field in product)) {
-            return console.log("Todos los campos son obligatorios");
+    async getProductById(id) {
+        const products = JSON.parse(await fs.readFile(this.path, "utf-8"));
+        const product = products.find(p => p.id === id);
+
+        if (!product) {
+            throw new Error("Product not found");
         }
 
-        const products = JSON.parse(await fs.readFile(this.path, `utf-8`))
-        const encontrado = products.find((p) => p.id === product.id)
+        return product;
+    }
+    async getProductByCode(code) {
+        const products = JSON.parse(await fs.readFile(this.path, "utf-8"));
+        const product = products.find(p => p.code === code);
+    
+        if (!product) {
+          throw new Error("Product not found");
+        }
+    
+        return product;
+      }
 
-        if (encontrado) {
-            console.log(`Producto encontrado`);
+      async updateProducts(id, product) {
+        const products = JSON.parse(await fs.readFile(this.path, `utf-8`))
+        const productIndex = products.findIndex((p) => p.id === id)
+
+        if (productIndex === -1) {
+            throw new Error("Product not found");
         } else {
-            products.push(product)
+            products[productIndex] = { ...products[productIndex], ...product };
             await fs.writeFile(this.path, JSON.stringify(products))
         }
-    }
-
-    async getProducts() {
-
-        const prods = JSON.parse(await fs.readFile(this.path, `utf-8`))
-        console.log(prods);
-    }
-
-    async getProductsById(id) {
-
-        const products = JSON.parse(await fs.readFile(this.path, `utf-8`))
-        const encontrado = products.find((p) => p.id === id)
-
-        if (encontrado == undefined) {
-            return console.error(`Not Found`)
-        } else {
-            return console.log(encontrado)
-        }
-
-    }
-
-    async updateProducts(id, product) {
-        const products = JSON.parse(await fs.readFile(this.path, `utf-8`))
-        const encontrado = products.findIndex((p) => p.id === id)
-
-        if (encontrado === -1) {
-            return console.error(`Not Found`)
-        } else {
-            products[encontrado].title = product.title
-            products[encontrado].description = product.description
-            products[encontrado].price = product.price
-            products[encontrado].thumbnail = product.thumbnail
-            products[encontrado].code = product.code
-            products[encontrado].stock = product.stock
-            await fs.writeFile(this.path, JSON.stringify(products))
-
-        }
-
     }
     async deleteProducts(id) {
         const products = JSON.parse(await fs.readFile(this.path, `utf-8`))
-        const encontrado = products.find((p) => p.id === id)
+        const productExists = products.some((p) => p.id === id)
 
-        if (encontrado) {
+        if (productExists) {
             await fs.writeFile(this.path, JSON.stringify(products.filter(el => el.id != id)))
         } else {
-            console.error(`Not found`);
+            throw new Error("Product not found");
         }
     }
-
 }
+
