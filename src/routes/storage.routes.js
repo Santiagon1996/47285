@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { CartManager } from "../StorageManager";
+import { CartManager } from "../StorageManager.js";
 
-const cartsRouter = Router();
+export const cartsRouter = Router();
 
 const cartManager = new CartManager();
 
@@ -41,4 +41,3 @@ cartsRouter.post('/:cid/product/:pid', async (req, res) => {
     }
 })
 
-export default cartsRouter;

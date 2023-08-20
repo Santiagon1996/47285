@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ProductManager } from "../ProductManager";
+import { ProductManager } from "../ProductManager.js";
 
-const prodsRouter = Router();
+export const prodsRouter = Router();
 const path = `../productos.json`;
 const productManager = new ProductManager(path);
 
-prodsRouter.get("/", async (req, res) => {
+prodsRouter.get("/test", async (req, res) => {
   try {
     const products = await productManager.getProducts();
     const limit = Number(req.query.limit);
@@ -88,4 +88,3 @@ prodsRouter.delete("/:id", async (req, res) => {
 });
 
 
-export default prodsRouter
