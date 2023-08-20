@@ -1,8 +1,12 @@
 import { promises as fs } from "fs"
 
-const path = `../productos.json`;
 
-export  class ProductManager {
+
+const path = "../data/productos.json";
+
+
+
+  class ProductManager {
     constructor(path) {
         this.path = path
         this.products = this.getProducts();
@@ -77,3 +81,4 @@ export  class ProductManager {
     }
 }
 
+export const productManager = new ProductManager(path);
