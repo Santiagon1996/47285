@@ -1,4 +1,4 @@
-import {promises as fs} from 'fs';
+import { promises as fs } from 'fs';
 
 const path = `./storage.json`;
 
@@ -11,11 +11,11 @@ class Cart {
 
     addProduct(productId) {
         const productIndex = this.products.findIndex(p => p.product === productId);
-        if(productIndex === -1) {
-           
-            this.products.push({product: productId, quantity: 1});
+        if (productIndex === -1) {
+
+            this.products.push({ product: productId, quantity: 1 });
         } else {
-        
+
             this.products[productIndex].quantity += 1;
         }
     }
@@ -28,7 +28,7 @@ export class CartManager {
         this.carts = []
     }
 
-    saveToFile = async() => {
+    async saveToFile() {
         try {
             await fs.writeFile(this.path, JSON.stringify(this.carts, null, 2));
         } catch (error) {
@@ -36,7 +36,7 @@ export class CartManager {
         }
     }
 
-    getAllCarts = async() => {
+    async getAllCarts() {
         try {
             const data = await fs.readFile(this.path, 'utf-8');
             if (data.length > 0) {
@@ -55,7 +55,7 @@ export class CartManager {
         }
     }
 
-    createCart = async() => {
+    async createCart() {
         await this.getAllCarts();
         const newCart = new Cart(this.nextId);
         this.carts.push(newCart);
@@ -63,7 +63,7 @@ export class CartManager {
         return newCart;
     }
 
-    getCartById = async(id) => {
+    async getCartById(id) {
         await this.getAllCarts();
         const cart = this.carts.find(cart => Number(cart.id) === Number(id));
         if (!cart) {
@@ -72,7 +72,7 @@ export class CartManager {
         return cart;
     }
 
-    addProductToCart = async(cartId, productId) => {
+    async addProductToCart(cartId, productId) {
         const cart = await this.getCartById(cartId);
         cart.addProduct(productId);
         await this.saveToFile();

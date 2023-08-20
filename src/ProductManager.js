@@ -8,7 +8,7 @@ export class ProductManager {
         this.products = this.getProducts();
     }
     async addProduct(product) {
-        const requiredFields = ["title", "description", "price", "thumbnail", "code", "stock"];
+        const requiredFields = ["title", "description", "price", "thumbnail", "code", "stock","status"];
         if (!requiredFields.every(field => field in product)) {
             throw new Error("All fields are required");
         }

@@ -26,16 +26,16 @@ app.listen(PORT, () => {
 
 //Lista de Productos
 
-//const producto1 = new Productos("pelota", "deporte", 15000, [], "2PP", 10)
-// const producto2 = new Productos("musculosa", "ropa", 10000, [], "20MM", 5)
-// const producto3 = new Productos("auriculares", "tecnologia", 50000, [], "4AA", 7)
-// const producto4 = new Productos("teclado", "tecnologia", 3000, [], "4AA", 3)
-// const producto5 = new Productos("monitor", "tecnologia", 40000, [], "5MM", 77)
-// const producto6 = new Productos("botines", "deporte", 80000, [], "B66", 20)
-// const producto7 = new Productos("short", "deporte", 60000, [], "S77", 33)
-// const producto8 = new Productos("gorra", "ropa", 1000, [], "8GG", 12)
-// const producto9 = new Productos("pantalon", "ropa", 20000, [], "9PP", 4)
-// const producto10 = new Productos("celular", "tecnologia", 1000000, [], "10CC", 13)
+//const producto1 = new Productos("pelota", "deporte", 15000, [], "2PP", 10, true)
+// const producto2 = new Productos("musculosa", "ropa", 10000, [], "20MM", 5, true)
+// const producto3 = new Productos("auriculares", "tecnologia", 50000, [], "4AA", 7, true)
+// const producto4 = new Productos("teclado", "tecnologia", 3000, [], "4AA", 3, true)
+// const producto5 = new Productos("monitor", "tecnologia", 40000, [], "5MM", 77, true)
+// const producto6 = new Productos("botines", "deporte", 80000, [], "B66", 20, true)
+// const producto7 = new Productos("short", "deporte", 60000, [], "S77", 33, true)
+// const producto8 = new Productos("gorra", "ropa", 1000, [], "8GG", 12, true)
+// const producto9 = new Productos("pantalon", "ropa", 20000, [], "9PP", 4, true)
+// const producto10 = new Productos("celular", "tecnologia", 1000000, [], "10CC", 13, true)
 
 
 //Agregando Productos
