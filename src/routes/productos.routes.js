@@ -1,11 +1,11 @@
 import { Router } from "express";
-import {  productManager } from "../ProductManager.js";
+import {  productManager } from "../models/ProductManager.js";
 
 
 export const prodsRouter = Router();
 
 
-prodsRouter.get("/test", async (req, res) => {
+prodsRouter.get("/", async (req, res) => {
   try {
     const products = await productManager.getProducts();
     const limit = Number(req.query.limit);

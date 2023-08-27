@@ -2,14 +2,15 @@ import { promises as fs } from "fs"
 
 
 
+
+
+
 const path = "../data/productos.json";
 
-
-
-  class ProductManager {
+class ProductManager {
     constructor(path) {
-        this.path = path
-        this.products = this.getProducts();
+        this.path = path;
+        this.products = null;
     }
     async addProduct(product) {
         const requiredFields = ["title", "description", "price", "thumbnail", "code", "stock","status"];
@@ -27,15 +28,25 @@ const path = "../data/productos.json";
             await fs.writeFile(this.path, JSON.stringify(products));
         }
     }
-
     async getProducts() {
-        try {
-            const info = await fs.readFile(this.path, "utf-8");
-            return JSON.parse(info);
-        } catch (error) {
-            return []
+        if (!this.products) {
+            try {
+                const info = await fs.readFile(this.path, "utf-8");
+                this.products = JSON.parse(info);
+            } catch (error) {
+                this.products = [];
+            }
         }
+        return this.products;
     }
+    // async getProducts() {
+    //     try {
+    //         const info = await fs.readFile(this.path, "utf-8");
+    //         return JSON.parse(info);
+    //     } catch (error) {
+    //         return []
+    //     }
+    // }
 
     async getProductById(id) {
         const products = JSON.parse(await fs.readFile(this.path, "utf-8"));
@@ -80,5 +91,6 @@ const path = "../data/productos.json";
         }
     }
 }
+
 
 export const productManager = new ProductManager(path);

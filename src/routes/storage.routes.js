@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { CartManager } from "../StorageManager.js";
+import { CartManager } from "../models/StorageManager.js";
 
 export const cartsRouter = Router();
 
@@ -32,7 +32,7 @@ cartsRouter.post('/', async (req, res) => {
     }
 })
 
-cartsRouter.post('/:cid/product/:pid', async (req, res) => {
+cartsRouter.post('/:cid/products/:pid', async (req, res) => {
     try {
         await cartManager.addProductToCart(req.params.cid, req.params.pid);
         res.status(201).send("Product added to cart");

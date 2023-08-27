@@ -1,23 +1,61 @@
 
 import express from "express"
+import multer from 'multer'
 import {prodsRouter} from "./routes/productos.routes.js"
 import {cartsRouter} from './routes/storage.routes.js'; 
-
+import {__dirname} from "./path.js"
+import path from "path"
+import {engine} from "express-handlebars"
 
 // SERVER
 const PORT = 8080
 const app = express()
 
+//Config
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'src/public/img') //null hace referencia a que no envia errores
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}${file.originalname}`) //Concateno el nombre original de mi archivo con milisegundos con Date.now()
+    }
+})
 // Middleware
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+//Defino que motor de plantilla utilozo y su config
+app.engine(`handlebars`, engine())
+//Setting de mi app hbs
+app.set(`view engine`, `handlebars`)
+//Rutas de mis vistas uso el resolve como el metodo join, pero resulve rutas absoluta atraves de rutas relativas
+app.set(`views`, path.resolve(__dirname, `./views`))
+const upload = multer({ storage: storage })
+app.use(`/static`, express.static(path.join(__dirname, `/public`)))// Unir rutas en una sola concatenandolas
 
 
 
 //Routes
 app.use('/api/products', prodsRouter)
 app.use('/api/carts', cartsRouter)
+
+
+app.get(`/static`, (req, res )=>{
+    res.render(`home`, {
+        nombre: `casa`,
+        titleHome:`Inicio`,
+        titleProductos:`Productos`,
+        cssProduct: `product.css`,
+        cssHome: `style.css`
+    })
+})
+
+
+app.post('/upload', upload.single('product'), (req, res) => {
+    console.log(req.file)
+    console.log(req.body)
+    res.status(200).send("Imagen cargada")
+})
 
 app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`);
@@ -50,10 +88,6 @@ app.listen(PORT, () => {
 // productManager.addProduct(producto8)
 // productManager.addProduct(producto9)
 // productManager.addProduct(producto10)
-
-
-
-//cartManager.addProductToCart(1,1)
 
 
 
