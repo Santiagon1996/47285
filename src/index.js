@@ -1,37 +1,77 @@
 
 import express from "express"
 import multer from 'multer'
-import {prodsRouter} from "./routes/productos.routes.js"
-import {cartsRouter} from './routes/storage.routes.js'; 
-import {__dirname} from "./path.js"
+import { prodsRouter } from "./routes/productos.routes.js"
+import { cartsRouter } from './routes/storage.routes.js';
+import { __dirname } from "./path.js"
 import path from "path"
-import {engine} from "express-handlebars"
+import { engine } from "express-handlebars"
+import { Server } from "socket.io"
 
 // SERVER
 const PORT = 8080
 const app = express()
 
+
+
+
+
 //Config
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'src/public/img') //null hace referencia a que no envia errores
+        cb(null, 'src/public/img')
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}${file.originalname}`) //Concateno el nombre original de mi archivo con milisegundos con Date.now()
+        cb(null, `${Date.now()}${file.originalname}`) 
     }
 })
+
+const server = app.listen(PORT, () => {
+    console.log(`Server on port ${PORT}`);
+})
+
+
+
+
+
 // Middleware
 
 app.use(express.json())
-app.use(express.urlencoded({extended:true}))
-//Defino que motor de plantilla utilozo y su config
+app.use(express.urlencoded({ extended: true }))
+
 app.engine(`handlebars`, engine())
-//Setting de mi app hbs
 app.set(`view engine`, `handlebars`)
-//Rutas de mis vistas uso el resolve como el metodo join, pero resulve rutas absoluta atraves de rutas relativas
 app.set(`views`, path.resolve(__dirname, `./views`))
 const upload = multer({ storage: storage })
-app.use(`/static`, express.static(path.join(__dirname, `/public`)))// Unir rutas en una sola concatenandolas
+app.use(`/static`, express.static(path.join(__dirname, `/public`)))
+
+
+
+
+
+
+//SERVER SOCKET.IO
+const io = new Server(server)
+const mensajes = []
+io.on(`connection`, (socket) => {
+    console.log("Server Socket.io connection");
+    // socket.on(`mensajeConnection`, (user) =>{
+    //     if (user.rol === `Admin`) {
+    //         socket.emit(`credencialesConncetion`, `Usuario valido `)
+            
+    //     } else {
+    //         socket.emit(`credencialesConncetion`, `Credenciales no validas `)
+    //     }
+    // })
+
+    socket.on(`mensaje`, (infoMensaje) =>{
+        console.log(infoMensaje);
+        mensajes.push(infoMensaje)
+        socket.emit(`mensaje`,mensajes)
+    })
+})
+
+
 
 
 
@@ -39,17 +79,16 @@ app.use(`/static`, express.static(path.join(__dirname, `/public`)))// Unir rutas
 app.use('/api/products', prodsRouter)
 app.use('/api/carts', cartsRouter)
 
-
-app.get(`/static`, (req, res )=>{
-    res.render(`home`, {
+app.get(`/static`, (req, res) => {
+    res.render(`chat`, {
         nombre: `casa`,
-        titleHome:`Inicio`,
-        titleProductos:`Productos`,
+        titleChat: `Chat`,
+        titleHome: `Inicio`,
+        titleProductos: `Productos`,
         cssProduct: `product.css`,
         cssHome: `style.css`
     })
 })
-
 
 app.post('/upload', upload.single('product'), (req, res) => {
     console.log(req.file)
@@ -57,9 +96,6 @@ app.post('/upload', upload.single('product'), (req, res) => {
     res.status(200).send("Imagen cargada")
 })
 
-app.listen(PORT, () => {
-    console.log(`Server on port ${PORT}`);
-})
 
 
 //Lista de Productos
