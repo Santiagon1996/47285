@@ -1,3 +1,39 @@
 body{
-    background-color: green;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: antiquewhite;
+    margin:0 ;
+    padding: 20px;
+    
+   
+}
+
+h1{
+    text-align: center;
+}
+form{
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid ;
+
+}
+
+label, input{
+    display: block;
+    margin-bottom: 10px;
+
+}
+input{
+    width: 100%;
+    padding: 8px;
+    border: 1 px solid;
+
+}
+
+button{
+    background-color: blanchedalmond;
+    color: red;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
 }
