@@ -1,9 +1,8 @@
 import { Router } from "express";
-import {  productManager } from "../models/ProductManager.js";
+import ProductManager from "../../clases/ProductManager.js"
+const prodsRouter = Router();
 
-
-export const prodsRouter = Router();
-
+const productManager = new ProductManager();
 
 prodsRouter.get("/", async (req, res) => {
   try {
@@ -88,3 +87,4 @@ prodsRouter.delete("/:id", async (req, res) => {
 });
 
 
+export default prodsRouter

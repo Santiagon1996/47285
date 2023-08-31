@@ -1,12 +1,14 @@
 
 import express from "express"
 import multer from 'multer'
-import { prodsRouter } from "./routes/productos.routes.js"
-import { cartsRouter } from './routes/storage.routes.js';
+import prodsRouter from "./routes/productos.routes.js"
+import cartsRouter from './routes/storage.routes.js';
 import { __dirname } from "./path.js"
 import path from "path"
 import { engine } from "express-handlebars"
 import { Server } from "socket.io"
+import ProductManager from '../clases/ProductManager.js'
+import realTimeProductsRouter from "./routes/realTimeProducts.routes.js";
 
 // SERVER
 const PORT = 8080
@@ -22,7 +24,7 @@ const storage = multer.diskStorage({
         cb(null, 'src/public/img')
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}${file.originalname}`) 
+        cb(null, `${Date.now()}${file.originalname}`)
     }
 })
 
@@ -38,7 +40,6 @@ const server = app.listen(PORT, () => {
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
 app.engine(`handlebars`, engine())
 app.set(`view engine`, `handlebars`)
 app.set(`views`, path.resolve(__dirname, `./views`))
@@ -53,24 +54,36 @@ app.use(`/static`, express.static(path.join(__dirname, `/public`)))
 //SERVER SOCKET.IO
 const io = new Server(server)
 const mensajes = []
+const prods = []
 io.on(`connection`, (socket) => {
     console.log("Server Socket.io connection");
-    // socket.on(`mensajeConnection`, (user) =>{
-    //     if (user.rol === `Admin`) {
-    //         socket.emit(`credencialesConncetion`, `Usuario valido `)
-            
-    //     } else {
-    //         socket.emit(`credencialesConncetion`, `Credenciales no validas `)
-    //     }
-    // })
 
-    socket.on(`mensaje`, (infoMensaje) =>{
+    socket.on(`mensaje`, (infoMensaje) => {
         console.log(infoMensaje);
         mensajes.push(infoMensaje)
-        socket.emit(`mensaje`,mensajes)
+        socket.emit(`mensaje`, mensajes)
+    })
+
+    socket.on('addProduct', async (nuevoProd) => {
+        const manager = new ProductManager()
+        await manager.addProduct(JSON.stringify(nuevoProd))
+        const products = await manager.getProducts()
+        const lastProd = products[products.length - 1]
+        socket.emit('products', [lastProd])
+    })
+
+    socket.on('loadProducts', async () => {
+        const manager = new ProductManager()
+        const products = await manager.getProducts()
+        socket.emit('products', products)
+    })
+
+    socket.on('deleteProduct', async (id) => {
+        const manager = new ProductManager()
+        await manager.deleteProductById(id)
+        socket.emit('deleteRow', id)
     })
 })
-
 
 
 
@@ -78,17 +91,7 @@ io.on(`connection`, (socket) => {
 //Routes
 app.use('/api/products', prodsRouter)
 app.use('/api/carts', cartsRouter)
-
-app.get(`/static`, (req, res) => {
-    res.render(`realTimeProducts`, {
-        nombre: `casa`,
-        titleChat: `Chat`,
-        titleHome: `Inicio`,
-        titleProductos: `Productos`,
-        cssProduct: `product.css`,
-        cssHome: `style.css`
-    })
-})
+app.use('/static/realTimeProducts', realTimeProductsRouter)
 
 app.post('/upload', upload.single('product'), (req, res) => {
     console.log(req.file)

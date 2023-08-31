@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 
-const path = `../data/storage.json`;
+const path = `./data/storage.json`;
 
 
 class Cart {
