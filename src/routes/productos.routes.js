@@ -10,7 +10,7 @@ prodsRouter.get("/", async (req, res) => {
     const limit = Number(req.query.limit);
 
     if (!limit) {
-      return res.status(400).send(products);
+      return res.status(200).send(products);
     }
 
     const limitedProducts = products.slice(0, limit);
@@ -22,42 +22,32 @@ prodsRouter.get("/", async (req, res) => {
 
 prodsRouter.get("/:id", async (req, res) => {
   try {
-    const id = Number(req.params.id);
-    const products = await productManager.getProducts();
-
-    if (!id) {
-      return res.status(400).send(products);
+    const { id } = req.params
+    const products = await productManager.getProductById(Number(id));
+    if (id) {
+      return res.status(200).send(products);
     }
-
-    const product = products.find(p => p.id === id);
-    res.status(200).send(product);
   } catch (error) {
     res.status(500).send(error.message);
   }
 });
 
 prodsRouter.post("/", async (req, res) => {
-  try {
-    const { code } = req.body;
-    const productExists = await productManager.getProductsByCode(code);
-
-    if (productExists) {
-      return res.status(400).send("Product already exists");
-    }
-
-    const productAdded = await productManager.addProduct(req.body);
-    if (productAdded) {
-      res.status(200).send("Product created");
-    }
-  } catch (error) {
-    res.status(500).send(error.message);
+  const { code } = req.body;
+  const productExists = await productManager.getProductByCode(code);
+  if (!productExists) {
+    await productManager.addProduct(req.body)
+    res.status(200).send(req.body)
+  } else {
+    res.status(400).send('Product Already Created')
   }
 });
+
 
 prodsRouter.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const productExists = await productManager.getProductsById(parseInt(id));
+    const productExists = await productManager.getProductById(parseInt(id));
 
     if (productExists) {
       await productManager.updateProducts(id, req.body);
@@ -73,10 +63,11 @@ prodsRouter.put("/:id", async (req, res) => {
 prodsRouter.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const productExists = await productManager.getProductsById(parseInt(id));
+    const productExists = await productManager.getProductById(parseInt(id));
 
     if (productExists) {
-      await productManager.deleteProductsProducts(id);
+      await productManager.deleteProductById(id);
+      console.log(`Product ID ${id} Was Deleted`)
       res.status(200).send("Product deleted");
     } else {
       res.status(404).send("Product not found");

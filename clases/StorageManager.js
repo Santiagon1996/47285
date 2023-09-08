@@ -1,82 +1,75 @@
 import { promises as fs } from 'fs';
 
-const path = `./data/storage.json`;
+const path = './data/carts.json'
 
-
-class Cart {
-    constructor(id) {
-        this.id = id;
-        this.products = [];
-    }
-
-    addProduct(productId) {
-        const productIndex = this.products.findIndex(p => p.product === productId);
-        if (productIndex === -1) {
-
-            this.products.push({ product: productId, quantity: 1 });
-        } else {
-
-            this.products[productIndex].quantity += 1;
-        }
-    }
-}
-
-export class CartManager {
+export default class CartManager {
     constructor() {
-        this.path = path;
-        this.nextId = 0;
-        this.carts = []
+        this.path = path
     }
 
-    async saveToFile() {
-        try {
-            await fs.writeFile(this.path, JSON.stringify(this.carts, null, 2));
-        } catch (error) {
-            console.error("Error saving carts:", error);
-        }
-    }
-
-    async getAllCarts() {
+    // Método para leer el archivo de carritos
+    async readCartsFile() {
         try {
             const data = await fs.readFile(this.path, 'utf-8');
-            if (data.length > 0) {
-                this.carts = JSON.parse(data);
-                const maxIdCart = this.carts.reduce((prev, curr) => (prev.id > curr.id) ? prev : curr);
-                this.nextId = maxIdCart.id + 1;
-            }
-            return this.carts;
+            return JSON.parse(data);
         } catch (error) {
-            if (error.code === 'ENOENT') {
-                console.log("Cart file not found. A new one will be created.");
-                return [];
-            } else {
-                console.error("Error reading cart file:", error);
-            }
+            console.error('Error reading the carts file:', error);
+            return [];
         }
+    }
+
+    // Método para escribir en el archivo de carritos
+    async writeCartsFile(carts) {
+        try {
+            await fs.writeFile(this.path, JSON.stringify(carts));
+        } catch (error) {
+            console.error('Error writing the carts file:', error);
+        }
+    }
+
+    async getCart(id) {
+        const carts = await this.readCartsFile();
+        return carts.find(cart => cart.id === Number(id));
     }
 
     async createCart() {
-        await this.getAllCarts();
-        const newCart = new Cart(this.nextId);
-        this.carts.push(newCart);
-        this.saveToFile();
-        return newCart;
+        const cart = await this.readCartsFile();
+        const id = await this.idCart();
+        cart.push({ id, products: [] });
+        await this.writeCartsFile(cart);
     }
 
-    async getCartById(id) {
-        await this.getAllCarts();
-        const cart = this.carts.find(cart => Number(cart.id) === Number(id));
-        if (!cart) {
-            throw new Error('Cart not found');
+    async addProductToCart(cid, pid) {
+        const carts = await this.readCartsFile();
+
+        if (!carts.length) return null;
+
+        const index = carts.findIndex(cart => cart.id === Number(cid));
+        if (index === -1) return console.log(`Cart ID Not Found`);
+
+
+        const pids = carts[index].products.map(prod => Number(prod.id));
+
+        if (!pids.includes(Number(pid))) {
+            carts[index].products.push({ id: pid, quantity: 1 });
+        } else {
+            const newCountProd = carts[index].products.map(prod => ({ id: prod.id, quantity: Number(prod.quantity) + 1 }));
+            carts[index] = { ...carts[index], products: [...newCountProd] };
         }
-        return cart;
+
+        await this.writeCartsFile(carts);
     }
 
-    async addProductToCart(cartId, productId) {
-        const cart = await this.getCartById(cartId);
-        cart.addProduct(productId);
-        await this.saveToFile();
+
+
+    async idCart() {
+        const carts = await this.readCartsFile();
+        if (carts.length < 1) return 1;
+        const ids = carts.map(cart => cart.id);
+        const id = Math.max(...ids) + 1;
+        return id;
     }
 }
+
 
 

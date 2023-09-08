@@ -3,18 +3,16 @@ import express from "express"
 import multer from 'multer'
 import prodsRouter from "./routes/productos.routes.js"
 import cartsRouter from './routes/storage.routes.js';
+import realTimeProductsRouter from "./routes/realTimeProducts.routes.js";
 import { __dirname } from "./path.js"
 import path from "path"
 import { engine } from "express-handlebars"
 import { Server } from "socket.io"
 import ProductManager from '../clases/ProductManager.js'
-import realTimeProductsRouter from "./routes/realTimeProducts.routes.js";
 
 // SERVER
 const PORT = 8080
 const app = express()
-
-
 
 
 
@@ -31,7 +29,6 @@ const storage = multer.diskStorage({
 const server = app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`);
 })
-
 
 
 
@@ -55,14 +52,17 @@ app.use(`/static`, express.static(path.join(__dirname, `/public`)))
 const io = new Server(server)
 const mensajes = []
 const prods = []
+
+
+
 io.on(`connection`, (socket) => {
     console.log("Server Socket.io connection");
 
-    socket.on(`mensaje`, (infoMensaje) => {
-        console.log(infoMensaje);
-        mensajes.push(infoMensaje)
-        socket.emit(`mensaje`, mensajes)
-    })
+    // socket.on(`mensaje`, (infoMensaje) => {
+    //     console.log(infoMensaje);
+    //     mensajes.push(infoMensaje)
+    //     socket.emit(`mensaje`, mensajes)
+    // })
 
     socket.on('addProduct', async (nuevoProd) => {
         const manager = new ProductManager()
