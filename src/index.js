@@ -1,14 +1,20 @@
 
 import express from "express"
 import multer from 'multer'
+import { Server } from "socket.io"
+import path from "path"
+import { engine } from "express-handlebars"
+import mongoose from "mongoose";
+import { productModel } from "./models/productos.models.js";
+import { messageModel } from "./models/mensajes.models.js";
+import { __dirname } from "./path.js"
+
 import prodsRouter from "./routes/productos.routes.js"
 import cartsRouter from './routes/storage.routes.js';
 import realTimeProductsRouter from "./routes/realTimeProducts.routes.js";
-import { __dirname } from "./path.js"
-import path from "path"
-import { engine } from "express-handlebars"
-import { Server } from "socket.io"
-import ProductManager from '../clases/ProductManager.js'
+import userRouter from "./routes/user.routes.js";
+import chatRouter from "./routes/chat.routes.js";
+import homeRouter from "./routes/home.routes.js";
 
 // SERVER
 const PORT = 8080
@@ -30,8 +36,12 @@ const server = app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`);
 })
 
+//MONGOOSE
+                                                    //pass
+mongoose.connect(`mongodb+srv://santiagoanardelli96:Milo0000@cluster0.cgwobx8.mongodb.net/?retryWrites=true&w=majority`)
 
-
+    .then(() => console.log(`DB is connect`))
+    .catch(() => console.log(`Error connect DB`))
 
 // Middleware
 
@@ -44,44 +54,45 @@ const upload = multer({ storage: storage })
 app.use(`/static`, express.static(path.join(__dirname, `/public`)))
 
 
-
-
-
-
 //SERVER SOCKET.IO
 const io = new Server(server)
 const mensajes = []
 const prods = []
-
-
-
 io.on(`connection`, (socket) => {
     console.log("Server Socket.io connection");
 
-    // socket.on(`mensaje`, (infoMensaje) => {
-    //     console.log(infoMensaje);
-    //     mensajes.push(infoMensaje)
-    //     socket.emit(`mensaje`, mensajes)
-    // })
-
     socket.on('addProduct', async (nuevoProd) => {
-        const manager = new ProductManager()
-        await manager.addProduct(JSON.stringify(nuevoProd))
-        const products = await manager.getProducts()
-        const lastProd = products[products.length - 1]
+        await productModel.create(nuevoProd)
+        const allProds = await productModel.find()
+        const lastProd = allProds[allProds.length -1]
         socket.emit('products', [lastProd])
     })
-
     socket.on('loadProducts', async () => {
-        const manager = new ProductManager()
-        const products = await manager.getProducts()
-        socket.emit('products', products)
+        const prodModel = await productModel.find()
+        socket.emit('products', prodModel )
     })
 
     socket.on('deleteProduct', async (id) => {
-        const manager = new ProductManager()
-        await manager.deleteProductById(id)
+        console.log(id)
+        await productModel.findOneAndDelete(id)
         socket.emit('deleteRow', id)
+    })
+    socket.on('mensajeConexion', (user) => {
+        if (user.rol === "Admin") {
+            socket.emit('credencialesConexion', "Usuario valido")
+        } else {
+            socket.emit('credencialesConexion', "Usuario no valido")
+        }
+    })
+    socket.on('mensaje', async (infoMensaje) => {
+        await messageModel.create(infoMensaje)
+        const messages = await messageModel.find()
+        console.log(messages)
+        io.emit('mensajes', messages)
+    })
+    socket.on('loadMessages', async () => {
+        const messages = await messageModel.find()
+        socket.emit('mensajes', messages)
     })
 })
 
@@ -89,9 +100,13 @@ io.on(`connection`, (socket) => {
 
 
 //Routes
+app.use('/static/home', homeRouter)
 app.use('/api/products', prodsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/static/realTimeProducts', realTimeProductsRouter)
+app.use(`/api/user`, userRouter)
+app.use('/static/chat', chatRouter)
+
 
 app.post('/upload', upload.single('product'), (req, res) => {
     console.log(req.file)

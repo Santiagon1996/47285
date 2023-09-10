@@ -1,22 +1,11 @@
-// Swal.fire('Any fool can use a computer')
-
-
-
-// const socket = io()
-
-// socket.emit(`mensajeConnection`, {user: `Santiago`, rol: `Admin`})
-
-// socket.on(`credencialesConncetion`, (info) => {
-//     console.log(info);
-// })
 
 
 
 const socket = io()
 
-const sendChat =document.getElementById(`sendChat`)
+const sendChat = document.getElementById(`sendChat`)
 const parrafoMensajes = document.getElementById(`parrafoMensajes`)
-const valInput= document.getElementById(`chatBox`)
+const valInput = document.getElementById(`chatBox`)
 
 let user
 
@@ -29,15 +18,15 @@ Swal.fire({
     },
     allowOutsideClick: false
 }).then(resultado => {
-    user= resultado.value
+    user = resultado.value
     console.log(user);
 })
 
 sendChat.addEventListener(`click`, () => {
-    let fechaActual= new Date().toLocaleString()
+    let fechaActual = new Date().toLocaleString()
 
     if (valInput.value.trim().length > 0) {
-        socket.emit(`mensaje`, {fecha: fechaActual, user: user, mensaje: valInput.value})
+        socket.emit(`mensaje`, { fecha: fechaActual, user: user, mensaje: valInput.value })
         valInput.value = ``
     }
 })
@@ -46,7 +35,7 @@ socket.on(`mensaje`, (arrayMensajes) => {
     parrafoMensajes.innerHTML = ""
     arrayMensajes.forEach(mensaje => {
         parrafoMensajes.innerHTML += `<p> ${mensaje.fecha}: el usuario ${mensaje.user} escribio ${mensaje.mensaje} </p>`
-        
+
     });
 
 })

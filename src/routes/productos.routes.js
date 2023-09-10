@@ -1,79 +1,72 @@
 import { Router } from "express";
-import ProductManager from "../../clases/ProductManager.js"
+import { productModel } from "../models/productos.models.js";
 const prodsRouter = Router();
 
-const productManager = new ProductManager();
+
 
 prodsRouter.get("/", async (req, res) => {
+  const { limit } = req.query
+
   try {
-    const products = await productManager.getProducts();
-    const limit = Number(req.query.limit);
-
-    if (!limit) {
-      return res.status(200).send(products);
-    }
-
-    const limitedProducts = products.slice(0, limit);
-    res.status(200).send(limitedProducts);
+      const prods = await productModel.find().limit(limit)
+      res.status(200).send({ respuesta: 'OK', mensaje: prods })
   } catch (error) {
-    res.status(500).send(error.message);
+      res.status(400).send({ respuesta: 'Error en consultar productos', mensaje: error })
   }
-});
+})
+
 
 prodsRouter.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params
-    const products = await productManager.getProductById(Number(id));
-    if (id) {
-      return res.status(200).send(products);
+  const { id } = req.params
+
+    try {
+        const prod = await productModel.findById(id)
+        if (prod)
+            res.status(200).send({ respuesta: 'OK', mensaje: prod })
+        else
+            res.status(404).send({ respuesta: 'Error en consultar Producto', mensaje: 'Not Found' })
+    } catch (error) {
+        res.status(400).send({ respuesta: 'Error en consulta producto', mensaje: error })
     }
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
 });
 
 prodsRouter.post("/", async (req, res) => {
-  const { code } = req.body;
-  const productExists = await productManager.getProductByCode(code);
-  if (!productExists) {
-    await productManager.addProduct(req.body)
-    res.status(200).send(req.body)
-  } else {
-    res.status(400).send('Product Already Created')
-  }
+  const { title, description, stock, code, price, category } = req.body
+    try {
+        const prod = await productModel.create({ title, description, stock, code, price, category })
+        res.status(200).send({ respuesta: 'OK', mensaje: prod })
+    } catch (error) {
+        res.status(400).send({ respuesta: 'Error en crear productos', mensaje: error })
+    }
 });
 
 
 prodsRouter.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const productExists = await productManager.getProductById(parseInt(id));
+  const { id } = req.params
+    const { title, description, stock, status, code, price, category } = req.body
 
-    if (productExists) {
-      await productManager.updateProducts(id, req.body);
-      res.status(200).send(`Product updated`);
-    } else {
-      res.status(404).send("Product not found");
+    try {
+        const prod = await productModel.findByIdAndUpdate(id, { title, description, stock, status, code, price, category })
+        if (prod)
+            res.status(200).send({ respuesta: 'OK', mensaje: 'Producto actualizado' })
+        else
+            res.status(404).send({ respuesta: 'Error en actualizar Producto', mensaje: 'Not Found' })
+    } catch (error) {
+        res.status(400).send({ respuesta: 'Error en actualizar producto', mensaje: error })
     }
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
 });
 
 prodsRouter.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const productExists = await productManager.getProductById(parseInt(id));
+  const { id } = req.params
 
-    if (productExists) {
-      await productManager.deleteProductById(id);
-      console.log(`Product ID ${id} Was Deleted`)
-      res.status(200).send("Product deleted");
-    } else {
-      res.status(404).send("Product not found");
-    }
+  try {
+      const prod = await productModel.findByIdAndDelete(id)
+      if (prod)
+          res.status(200).send({ respuesta: 'OK', mensaje: 'Producto eliminado' })
+      else
+          res.status(404).send({ respuesta: 'Error en eliminar Producto', mensaje: 'Not Found' })
   } catch (error) {
-    res.status(500).send(error.message);
+      res.status(400).send({ respuesta: 'Error en eliminar producto', mensaje: error })
   }
 });
 

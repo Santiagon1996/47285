@@ -1,46 +1,74 @@
 import { Router } from 'express';
-import CartManager from "../../clases/StorageManager.js"
+import { cartModel } from "../models/cart.models.js";
+import { productModel } from "../models/productos.models.js";
 const cartsRouter = Router();
 
-const cartManager = new CartManager();
 
 cartsRouter.get('/', async (req, res) => {
+    const { id } = req.params
+
     try {
-        const carts = await cartManager.readCartsFile();
-        res.status(200).send(carts);
+        const cart = await cartModel.findById(id)
+        if (cart)
+            res.status(200).send({ respuesta: 'OK', mensaje: cart })
+        else
+            res.status(404).send({ respuesta: 'Error en consultar Carrito', mensaje: 'Not Found' })
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        res.status(400).send({ respuesta: 'Error en consulta carrito', mensaje: error })
     }
 });
 
 cartsRouter.get('/:id', async (req, res) => {
+    const { id } = req.params
+
     try {
-        const cart = await cartManager.getCart(req.params.id);
-        if (!cart) {
-            res.status(404).send({ error: 'Cart not found' });
-        } else {
-            res.status(200).send(cart);
-        }
+        const cart = await cartModel.findById(id)
+        if (cart)
+            res.status(200).send({ respuesta: 'OK', mensaje: cart })
+        else
+            res.status(404).send({ respuesta: 'Error en consultar Carrito', mensaje: 'Not Found' })
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        res.status(400).send({ respuesta: 'Error en consulta carrito', mensaje: error })
     }
 });
 
 cartsRouter.post('/', async (req, res) => {
     try {
-        await cartManager.createCart();
-        res.status(201).send("Cart created");
+        const cart = await cartModel.create({})
+        res.status(200).send({ respuesta: 'OK', mensaje: cart })
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        res.status(400).send({ respuesta: 'Error en crear Carrito', mensaje: error })
     }
 });
 
 cartsRouter.post('/:cid/products/:pid', async (req, res) => {
+    const { cid, pid } = req.params
+    const { quantity } = req.body
+
     try {
-        await cartManager.addProductToCart(req.params.cid, req.params.pid);
-        res.status(201).send("Product added to cart");
+        const cart = await cartModel.findById(cid)
+        if (cart) {
+            const prod = await productModel.findById(pid) //Busco si existe en LA BDD, no en el carrito
+
+            if (prod) {
+                const indice = cart.products.products.findIndex(item => item.id_prod == pid) //Busco si existe en el carrito
+                if (indice != -1) {
+                    cart.products.products[indice].quantity = quantity //Si existe en el carrito modifico la cantidad
+                } else {
+                    cart.products.products.push({ id_prod: pid, quantity: quantity }) //Si no existe, lo agrego al carrito
+                }
+                const respuesta = await cartModel.findByIdAndUpdate(cid, cart) //Actualizar el carrito
+                res.status(200).send({ respuesta: 'OK', mensaje: respuesta })
+            } else {
+                res.status(404).send({ respuesta: 'Error en agregar producto Carrito', mensaje: 'Produt Not Found' })
+            }
+        } else {
+            res.status(404).send({ respuesta: 'Error en agregar producto Carrito', mensaje: 'Cart Not Found' })
+        }
+
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        console.log(error)
+        res.status(400).send({ respuesta: 'Error en agregar producto Carrito', mensaje: error })
     }
 });
 
