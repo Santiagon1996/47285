@@ -37,8 +37,8 @@ const server = app.listen(PORT, () => {
 })
 
 //MONGOOSE
-                                                    //pass
-mongoose.connect(`mongodb+srv://santiagoanardelli96:XXXXX@cluster0.cgwobx8.mongodb.net/?retryWrites=true&w=majority`)
+                                                
+mongoose.connect(`mongodb+srv://santiagoanardelli96:Milo0000@cluster0.cgwobx8.mongodb.net/?retryWrites=true&w=majority`)
 
     .then(() => console.log(`DB is connect`))
     .catch(() => console.log(`Error connect DB`))

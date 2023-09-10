@@ -1,1 +1,93 @@
-[{"title":"musculosa","description":"ropa","price":10000,"thumbnail":[],"code":"20MM","stock":5,"id":1,"status":true},{"title":"musculosa","description":"ropa","price":10000,"thumbnail":[],"code":"20MM","stock":5,"id":2},{"title":"auriculares","description":"tecnologia","price":50000,"thumbnail":[],"code":"4AA","stock":7,"id":3},{"title":"teclado","description":"tecnologia","price":3000,"thumbnail":[],"code":"4AA","stock":3,"id":4},{"title":"monitor","description":"tecnologia","price":40000,"thumbnail":[],"code":"5MM","stock":77,"id":5},{"title":"botines","description":"deporte","price":80000,"thumbnail":[],"code":"B66","stock":20,"id":6},{"title":"short","description":"deporte","price":60000,"thumbnail":[],"code":"S77","stock":33,"id":7},{"title":"gorra","description":"ropa","price":1000,"thumbnail":[],"code":"8GG","stock":12,"id":8},{"title":"pantalon","description":"ropa","price":20000,"thumbnail":[],"code":"9PP","stock":4,"id":9},{"title":"celular","description":"tecnologia","price":1000000,"thumbnail":[],"code":"10CC","stock":13,"id":10}]
+[
+    {
+        "title": "musculosa",
+        "description": "ropa",
+        "price": 10000,
+        "thumbnail": [],
+        "code": "20MM",
+        "stock": 5,
+        "id": 1,
+        "status": true
+    },
+    {
+        "title": "musculosa",
+        "description": "ropa",
+        "price": 10000,
+        "thumbnail": [],
+        "code": "20MM",
+        "stock": 5,
+        "id": 2
+    },
+    {
+        "title": "auriculares",
+        "description": "tecnologia",
+        "price": 50000,
+        "thumbnail": [],
+        "code": "4AA",
+        "stock": 7,
+        "id": 3
+    },
+    {
+        "title": "teclado",
+        "description": "tecnologia",
+        "price": 3000,
+        "thumbnail": [],
+        "code": "4AA",
+        "stock": 3,
+        "id": 4
+    },
+    {
+        "title": "monitor",
+        "description": "tecnologia",
+        "price": 40000,
+        "thumbnail": [],
+        "code": "5MM",
+        "stock": 77,
+        "id": 5
+    },
+    {
+        "title": "botines",
+        "description": "deporte",
+        "price": 80000,
+        "thumbnail": [],
+        "code": "B66",
+        "stock": 20,
+        "id": 6
+    },
+    {
+        "title": "short",
+        "description": "deporte",
+        "price": 60000,
+        "thumbnail": [],
+        "code": "S77",
+        "stock": 33,
+        "id": 7
+    },
+    {
+        "title": "gorra",
+        "description": "ropa",
+        "price": 1000,
+        "thumbnail": [],
+        "code": "8GG",
+        "stock": 12,
+        "id": 8
+    },
+    {
+        "title": "pantalon",
+        "description": "ropa",
+        "price": 20000,
+        "thumbnail": [],
+        "code": "9PP",
+        "stock": 4,
+        "id": 9
+    },
+    {
+        "title": "celular",
+        "description": "tecnologia",
+        "price": 1000000,
+        "thumbnail": [],
+        "code": "10CC",
+        "stock": 13,
+        "id": 10
+    }
+]

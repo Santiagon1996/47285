@@ -3,7 +3,13 @@ import { Schema, model } from "mongoose";
 const messagesSchema = new Schema({
     email: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: function(v) {
+                return /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(v);
+            },
+            message: props => `${props.value} is not a valid email!`
+        },
     },
     message: {
         type: String,
@@ -11,7 +17,7 @@ const messagesSchema = new Schema({
     },
     postTime: {
         type: Date,
-        default: Date.now //Devolve la fecha actual
+        default: Date.now 
     }
 })
 
