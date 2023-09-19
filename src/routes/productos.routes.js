@@ -4,17 +4,41 @@ const prodsRouter = Router();
 
 
 
+// prodsRouter.get("/", async (req, res) => {
+//     let { limit } = req.query
+//     let { page } = req.query
+//     let { sort } = req.query
+//     let { category } = req.query
+//     limit = limit ?? 10
+//     page = page ?? 1
+
+//     try {
+//         const prods = await productModel.paginate(category ? { category: category } : {}, { limit: limit, page: page, sort: { price: sort } })
+//         res.status(200).send({ respuesta: 'OK', mensaje: prods })
+//     } catch (error) {
+//         res.status(400).send({ respuesta: 'Error en consultar productos', mensaje: error })
+//     }
+// })
 prodsRouter.get("/", async (req, res) => {
-  const { limit } = req.query
+    let { limit = 10, page = 1, sort, category } = req.query;
+    limit = Number(limit);
+    page = Number(page);
 
-  try {
-      const prods = await productModel.find().limit(limit)
-      res.status(200).send({ respuesta: 'OK', mensaje: prods })
-  } catch (error) {
-      res.status(400).send({ respuesta: 'Error en consultar productos', mensaje: error })
-  }
-})
+    if (!Number.isInteger(limit) || limit <= 0) {
+        return res.status(400).send({ respuesta: 'Error', mensaje: 'Limit debe ser un número positivo' });
+    }
 
+    if (!Number.isInteger(page) || page <= 0) {
+        return res.status(400).send({ respuesta: 'Error', mensaje: 'Page debe ser un número positivo' });
+    }
+
+    try {
+        const prods = await productModel.paginate(category ? { category: category } : {}, { limit: limit, page: page, sort: { price: sort } });
+        res.status(200).send({ respuesta: 'OK', mensaje: prods });
+    } catch (error) {
+        res.status(400).send({ respuesta: 'Error en consultar productos', mensaje: error.message });
+    }
+});
 
 prodsRouter.get("/:id", async (req, res) => {
   const { id } = req.params
