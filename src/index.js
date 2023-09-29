@@ -1,15 +1,18 @@
 import 'dotenv/config'
 import express from "express"
 import multer from 'multer'
+import cookieParser from 'cookie-parser'
+import session from 'express-session'
+import MongoStore from 'connect-mongo'
 import { Server } from "socket.io"
 import path from "path"
 import { engine } from "express-handlebars"
 import mongoose from "mongoose";
 import { productModel } from "./models/productos.models.js";
 import { messageModel } from "./models/mensajes.models.js";
-import { cartModel } from "./models/cart.models.js";
-import { orderModel } from "./models/orders.model.js"
-import { userModel } from "./models/user.models.js";
+// import { cartModel } from "./models/cart.models.js";
+// import { orderModel } from "./models/orders.model.js"
+// import { userModel } from "./models/user.models.js";
 import { __dirname } from "./path.js"
 
 import prodsRouter from "./routes/productos.routes.js"
@@ -18,6 +21,9 @@ import realTimeProductsRouter from "./routes/realTimeProducts.routes.js";
 import userRouter from "./routes/user.routes.js";
 import chatRouter from "./routes/chat.routes.js";
 import homeRouter from "./routes/home.routes.js";
+import sessionRouter from './routes/session.routes.js'
+import loginRouter from './routes/login.routes.js';
+
 
 // SERVER
 const PORT = 8080
@@ -39,6 +45,7 @@ const server = app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`);
 })
 
+
 //MONGOOSE
 
 mongoose.connect(process.env.MONGO_URL)
@@ -46,47 +53,8 @@ mongoose.connect(process.env.MONGO_URL)
     .then(async () => {
         console.log(`DB is connect`)
 
-        const resultado= await productModel.paginate({limit: 3, page: 1, sort:{edad:`asc`}})
-        console.log(resultado);
-
-        // const resultado = await cartModel.findOne({_id:`6500c4199bc4156e34f5045e`})
-        // console.log(JSON.stringify(resultado));
-
-
-        // await orderModel.create([
-        //     {title:`Monitor`, price: 10000, quantity: 1,},
-        //     {title:`Musculosa `, price: 20000, quantity: 2,},
-        //     {title:`Pelota `, price: 30000, quantity: 3,},
-        //     {title:`Celular `, price: 4000, quantity: 4,},
-        //     {title:`Monitor `, price: 50000, quantity: 5,}
-        // ])
-        // const resultado = await orderModel.aggregate([
-        //     {
-        //         $match: { price: 30000}//Busqueda
-        //     },
-        //     {
-        //         $group: {_id:`$title`, totalQuantity: {$sum: `$quantity`}, totalPrice: {$sum: `$price`} }//agrupacion
-        //     },
-        //     {
-        //         $sort: {totalQuantity:-1}//ordenamiento
-        //     },
-        //     {
-        //         $group:{_id:1, orders:{$push: "$$ROOT"}}//agruparlo en un objeto 
-        //     },
-        //     {
-        //         $project: {
-        //             "_id":0,
-        //             orders: "$orders"
-        //         }//genero proyecto en la base de datos
-        //     },
-        //     {
-        //         $merge:{
-        //             into:"reports"
-        //         }//guardo proyecto en mongoDB
-        //     }
-        // ])
+        // const resultado = await productModel.paginate({ limit: 3, page: 1, sort: { edad: `asc` } })
         // console.log(resultado);
-
 
     })
     .catch(() => console.log(`Error connect DB`))
@@ -94,6 +62,28 @@ mongoose.connect(process.env.MONGO_URL)
 // Middleware
 
 app.use(express.json())
+app.use(cookieParser(process.env.SIGNED_COOKIE))
+app.use(session({
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URL,
+        mongoOptions: {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        },
+        ttl: 60
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
+// //Verificar usuario admin
+// const auth = (req, res, next) => {
+//     if (req.session.email == `admin@admin.com` && req.session.password == `1234`) {
+//         return next()
+//     } else {
+//         res.send(`Usuario denegado como admin`)
+//     }
+// }
 app.use(express.urlencoded({ extended: true }))
 app.engine(`handlebars`, engine())
 app.set(`view engine`, `handlebars`)
@@ -154,6 +144,42 @@ app.use('/api/carts', cartsRouter)
 app.use('/static/realTimeProducts', realTimeProductsRouter)
 app.use(`/api/user`, userRouter)
 app.use('/static/chat', chatRouter)
+app.use('/static/session', sessionRouter)
+app.use('/static/login', loginRouter)
+
+// app.get(`/setCookie`, (req, res) => {
+//     res.cookie(`CookieCookie`, `Esto es una cookie`, { signed: true }).send(`Cookie generada`)
+// })
+// app.get(`/getCookie`, (req, res) => {
+//     res.send(req.signedCookies)
+// })
+
+// app.get(`/session`, (req, res) => {
+//     if (req.session.counter) {
+//         req.session.counter++
+//         res.send(`Se visito el sitio ${req.session.counter} veces`)
+
+//     } else {
+//         req.session.counter = 1
+//         res.send(`Bienvendio`)
+//     }
+// })
+
+// app.get(`/login`, (req, res) => {
+//     const { email, password } = req.body
+
+//     req.session.email = email
+//     req.session.password = password
+//     console.log(req.session.email);
+//     console.log(req.session.password);
+//     res.send(`Usuario ingresado`)
+
+// })
+
+// app.get(`/admin`, auth, (req, res) => {
+//     res.send(`ADMIN`)
+// })
+
 
 
 app.post('/upload', upload.single('product'), (req, res) => {
